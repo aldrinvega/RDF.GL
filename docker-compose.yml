@@ -1,0 +1,38 @@
+version: '3.4'
+
+networks:
+  rdf.gl.api:
+
+services:
+  rdf.gl:
+    image: ${DOCKER_REGISTRY-}rdfgl
+    build:
+      context: .
+      dockerfile: RDF.GL/Dockerfile
+    ports:
+    - "5003:5003"
+    - "5004:5004"
+    depends_on: 
+      - gl.database
+    networks: 
+      - rdf.gl.api
+
+  gl.database: 
+     image: mcr.microsoft.com/mssql/server:2022-latest
+     container_name: gl.database
+     environment:
+         - ACCEPT_EULA=Y
+         - MSSQL_SA_PASSWORD=Aldrin004!
+         - DB_NAME=ProjectGL
+         - DB_SA_PASSWORD=Aldrin004! 
+     networks:
+       - rdf.gl.api
+     volumes:
+      - ./data:/var/opt/mssql/data
+      - ./log:/var/opt/mssql/log
+      - ./secrets:/var/opt/mssql/secrets
+      - umdry-volume:/var/lib/mysql
+     ports:
+        - "5006:1433"
+volumes:
+  umdry-volume:
