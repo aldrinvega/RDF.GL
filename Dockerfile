@@ -9,13 +9,11 @@ EXPOSE 5004
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["RDF.GL/RDF.GL.csproj", "RDF.GL/"]
+COPY ["./RDF.GL.csproj", "RDF.GL/"]
 RUN dotnet restore "./RDF.GL/RDF.GL.csproj"
 COPY . .
 WORKDIR "/src/RDF.GL"
-RUN dotnet build "./RDF.GL.csproj" -c $BUILD_CONFIGURATION -o /app/build
-
-RUN dotnet dev-certs https
+RUN dotnet build "RDF.GL.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
