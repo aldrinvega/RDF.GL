@@ -38,7 +38,7 @@ public class AddNewUser : ControllerBase
         public string LastName { get; set; }
         public string Sex { get; set; }
         public string Username { get; set; }
-        public int UserRoleId { get; set; }
+        public int? UserRoleId { get; set; }
     }
 
     public class Handler : IRequestHandler<AddNewUserCommand, Result>

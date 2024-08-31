@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -16,14 +15,15 @@ namespace RDF.GL.Migrations
                 name: "user_roles",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    user_role_name = table.Column<string>(type: "text", nullable: false),
-                    permissions = table.Column<string[]>(type: "text[]", nullable: true),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    added_by = table.Column<int>(type: "integer", nullable: false),
-                    modified_by = table.Column<int>(type: "integer", nullable: false)
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    user_role_name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    permissions = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    created_at = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    updated_at = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    added_by = table.Column<int>(type: "int", nullable: false),
+                    modified_by = table.Column<int>(type: "int", nullable: false),
+                    is_active = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -34,12 +34,20 @@ namespace RDF.GL.Migrations
                 name: "users",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    fullname = table.Column<string>(type: "text", nullable: true),
-                    username = table.Column<string>(type: "text", nullable: true),
-                    password = table.Column<string>(type: "text", nullable: true),
-                    user_role_id = table.Column<int>(type: "integer", nullable: true)
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    id_prefix = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    id_number = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    first_name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    middle_name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    last_name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    username = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    password = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    sex = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    user_role_id = table.Column<int>(type: "int", nullable: true),
+                    is_active = table.Column<bool>(type: "bit", nullable: false),
+                    created_at = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {

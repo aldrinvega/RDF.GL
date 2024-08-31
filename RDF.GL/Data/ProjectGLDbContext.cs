@@ -22,6 +22,24 @@ public class ProjectGLDbContext :DbContext
             .HasOne(x => x.ModifiedByUser)
             .WithMany()
             .HasForeignKey(x => x.ModifiedBy);
+
+        modelBuilder.Entity<Users>().HasData(new Users
+        {
+            Id = 1,
+            Username = "admin",
+            Password = BCrypt.Net.BCrypt.HashPassword("admin"),
+            IsActive = true,
+            CreatedAt = DateTime.Now
+        });
+        modelBuilder.Entity<UserRole>().HasData(new UserRole
+        {
+            Id = 1,
+            UserRoleName = "Admin",
+            AddedBy = 1,
+            ModifiedBy = 1,
+            UpdatedAt = DateTime.UtcNow
+        });
+
     }
 
 }

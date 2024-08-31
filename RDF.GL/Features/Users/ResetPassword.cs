@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RDF.Arcana.API.Features.Users;
@@ -12,6 +13,7 @@ namespace RDF.GL.Features.Users;
 
 public class ResetPassword(IMediator _mediator) : ControllerBase
 {
+    [AllowAnonymous]
     [HttpPatch("{id:int}/reset-password")]
     public async Task<IActionResult> Patch([FromRoute] int id)
     {

@@ -2,9 +2,9 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using RDF.GL.Data;
 
 #nullable disable
@@ -12,8 +12,8 @@ using RDF.GL.Data;
 namespace RDF.GL.Migrations
 {
     [DbContext(typeof(ProjectGLDbContext))]
-    [Migration("20240818020637_AdjustUserRoleNullablePermission")]
-    partial class AdjustUserRoleNullablePermission
+    [Migration("20240829021634_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -21,41 +21,45 @@ namespace RDF.GL.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.7")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("RDF.GL.Domain.UserRole", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasColumnName("id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("AddedBy")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasColumnName("added_by");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2")
                         .HasColumnName("created_at");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_active");
+
                     b.Property<int>("ModifiedBy")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasColumnName("modified_by");
 
-                    b.Property<string[]>("Permissions")
-                        .HasColumnType("text[]")
+                    b.Property<string>("Permissions")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("permissions");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime2")
                         .HasColumnName("updated_at");
 
                     b.Property<string>("UserRoleName")
-                        .HasColumnType("text")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("user_role_name");
 
                     b.HasKey("Id")
@@ -74,25 +78,57 @@ namespace RDF.GL.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasColumnName("id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Fullname")
-                        .HasColumnType("text")
-                        .HasColumnName("fullname");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("FirstName")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("first_name");
+
+                    b.Property<string>("IdNumber")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("id_number");
+
+                    b.Property<string>("IdPrefix")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("id_prefix");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_active");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("last_name");
+
+                    b.Property<string>("MiddleName")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("middle_name");
 
                     b.Property<string>("Password")
-                        .HasColumnType("text")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("password");
 
+                    b.Property<string>("Sex")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("sex");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("updated_at");
+
                     b.Property<int?>("UserRoleId")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasColumnName("user_role_id");
 
                     b.Property<string>("Username")
-                        .HasColumnType("text")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("username");
 
                     b.HasKey("Id")

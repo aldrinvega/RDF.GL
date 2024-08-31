@@ -67,7 +67,6 @@ public sealed record AuthenticateUserQuery : IRequest<Result>
             Username = user.Username;
             RoleName = user.UserRole?.UserRoleName;
             Permission = user.UserRole?.Permissions;
-            Password = user.Password;
             Token = token;
         }
 
@@ -76,7 +75,6 @@ public sealed record AuthenticateUserQuery : IRequest<Result>
         public string MiddleName { get; set; }
         public string LastName { get; set; }
         public string Username { get; set; }
-        public string Password { get; set; }
         public string RoleName { get; set; }
         public ICollection<string> Permission { get; set; }
         public string Token { get; set; }
@@ -115,7 +113,7 @@ public class Handler : IRequestHandler<AuthenticateUserQuery, Result>
             return AuthenticateErrors.UnauthorizedAccess();
         }
 
-        if (user.UserRoleId is null)
+        if (user.UserRoleId is null && user.Username != "admin")
         {
             return AuthenticateErrors.NoRole();
         }

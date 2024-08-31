@@ -31,13 +31,13 @@ builder.Services.AddControllers(
     }
 ).AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
-var connectionString = builder.Configuration.GetConnectionString("Neon_Development");
+var connectionString = builder.Configuration.GetConnectionString("Docker");
 
 builder.Services.AddDbContext<ProjectGLDbContext>(x =>
 {
     if (connectionString != null)
     {
-        x.UseNpgsql(connectionString, options =>
+        x.UseSqlServer(connectionString, options =>
         {
             options.EnableRetryOnFailure();
         }).UseSnakeCaseNamingConvention();
