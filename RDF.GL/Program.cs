@@ -1,6 +1,5 @@
 using System.Text;
 using System.Text.Json.Serialization;
-using Asp.Versioning;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -122,6 +121,11 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddHttpClient("changeme", m => { }).ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+    {
+        ServerCertificateCustomValidationCallback = (m, c, ch, e) => true
+    }); ;
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -141,7 +145,7 @@ app.UseAuthentication();
 app.UseAuthentication();
 app.UseHttpsRedirection();
 app.UseCors(clientPermission);
-app.ApplyMigrations();
+//app.ApplyMigrations();
 app.UseAuthorization();
 
 app.MapControllers();

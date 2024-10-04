@@ -9,4 +9,7 @@ public class UserRoleError
 
     public static Error UserRoleNotFound() =>
        new("UserRole.UserRoleAlreadyExist", "User Role not found");
+
+    public static Error UserRoleIsInUse() =>
+      new("UserRole.UserRoleIsInUse", "User Role is in use");
 }

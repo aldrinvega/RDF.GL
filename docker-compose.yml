@@ -25,7 +25,7 @@ services:
          - ACCEPT_EULA=Y
          - MSSQL_SA_PASSWORD=Aldrin004!
          - DB_NAME=ProjectGL
-         - DB_SA_PASSWORD=Aldrin004! 
+         - DB_SA_PASSWORD=Aldrin004!
      networks:
        - rdf.gl.api
      volumes:

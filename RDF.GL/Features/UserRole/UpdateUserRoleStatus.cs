@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RDF.GL.Common;
 using RDF.GL.Data;
-using Swashbuckle.AspNetCore.Annotations;
-using Swashbuckle.AspNetCore.Swagger;
 
 namespace RDF.GL.Features.UserRole;
 
@@ -31,11 +29,17 @@ public class UpdateUserRoleStatus(IMediator _mediator) : ControllerBase
         public async Task<Result> Handle(UpdateUserRoleStatusCommand request, CancellationToken cancellationToken)
         {
             var userRole = await _context.UserRoles
+                .Include(ur => ur.Users)
                 .FirstOrDefaultAsync(ur => ur.Id == request.Id, cancellationToken);
 
             if (userRole is null)
             {
                 return UserRoleError.UserRoleNotFound();
+            }
+
+            if(userRole.Users.Count > 0)
+            {
+                return UserRoleError.UserRoleIsInUse();
             }
 
             userRole.IsActive = !userRole.IsActive;

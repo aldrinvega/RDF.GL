@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RDF.GL.Common;
@@ -12,6 +13,7 @@ namespace RDF.GL.Features.UserRole;
 
 public class UpdateUserRole(IMediator _mediator) : ControllerBase
 {
+    [AllowAnonymous]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(
         [FromBody] UpdateUserRoleCommand command,

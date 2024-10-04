@@ -57,14 +57,14 @@ public class UpdateUser(IMediator _mediator) : ControllerBase
                 return UserErrors.NotFound();
             }
 
-            var userExist = await _context.Users.FirstOrDefaultAsync(u => u.IdNumber == request.IdNumber, cancellationToken);
+            var userExist = await _context.Users.FirstOrDefaultAsync(u => u.IdNumber == request.IdNumber && u.Id != request.Id, cancellationToken);
 
             if (userExist != null) 
             {
                 return UserErrors.UserAlreadyExist(request.LastName + ", " + request.FirstName + " " + request.MiddleName);
             }
 
-            var existingUserName = await _context.Users.FirstOrDefaultAsync(u => u.Username == request.Username, cancellationToken);
+            var existingUserName = await _context.Users.FirstOrDefaultAsync(u => u.Username == request.Username && u.Id != request.Id, cancellationToken);
 
             if (existingUserName != null)
             {

@@ -10,9 +10,31 @@ public class ProjectGLDbContext :DbContext
 
     public virtual DbSet<Users> Users { get; set; }
     public virtual DbSet<UserRole> UserRoles { get; set; }
+    public virtual DbSet<GeneralLedger> GeneralLedgers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // Seed the Users table
+        modelBuilder.Entity<Users>().HasData(new Users
+        {
+            Id = 1,
+            FirstName = "Admin",
+            Username = "admin",
+            Password = BCrypt.Net.BCrypt.HashPassword("admin"),
+            IsActive = true,
+            CreatedAt = DateTime.Now,
+            UserRoleId = 1
+        });
+
+        // Seed the UserRole table with the same user id
+        modelBuilder.Entity<UserRole>().HasData(new UserRole
+        {
+            Id = 1,
+            UserRoleName = "Admin",
+            UpdatedAt = DateTime.UtcNow,
+            Permissions = ["User Management"]
+        });
+
         modelBuilder.Entity<UserRole>()
             .HasOne(x => x.AddedByUser)
             .WithMany()
@@ -23,22 +45,13 @@ public class ProjectGLDbContext :DbContext
             .WithMany()
             .HasForeignKey(x => x.ModifiedBy);
 
-        modelBuilder.Entity<Users>().HasData(new Users
-        {
-            Id = 1,
-            Username = "admin",
-            Password = BCrypt.Net.BCrypt.HashPassword("admin"),
-            IsActive = true,
-            CreatedAt = DateTime.Now
-        });
-        modelBuilder.Entity<UserRole>().HasData(new UserRole
-        {
-            Id = 1,
-            UserRoleName = "Admin",
-            AddedBy = 1,
-            ModifiedBy = 1,
-            UpdatedAt = DateTime.UtcNow
-        });
+        modelBuilder.Entity<GeneralLedger>()
+            .HasOne(x => x.AddedByUser)
+            .WithMany()
+            .HasForeignKey(x => x.AddedBy);
+
+
+        
 
     }
 

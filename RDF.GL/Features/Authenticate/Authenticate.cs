@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using RDF.GL.Common;
 using RDF.GL.Data;
-using RDF.GL.Domain;
 using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -102,7 +101,7 @@ public class Handler : IRequestHandler<AuthenticateUserQuery, Result>
             .Include(x => x.UserRole)
             .SingleOrDefaultAsync(x => x.Username == command.Username, cancellationToken);
 
-        //Verify if the credentials is correct
+
         if (user == null || !BCrypt.Net.BCrypt.Verify(command.Password, user.Password))
         {
             return AuthenticateErrors.UsernamePasswordIncorrect();
@@ -114,6 +113,11 @@ public class Handler : IRequestHandler<AuthenticateUserQuery, Result>
         }
 
         if (user.UserRoleId is null && user.Username != "admin")
+        {
+            return AuthenticateErrors.NoRole();
+        }
+
+        if (user.UserRole == null && user.Username != "admin")
         {
             return AuthenticateErrors.NoRole();
         }

@@ -39,9 +39,9 @@ public class AddNewUserRole : ControllerBase
     public class AddNewUserRoleCommand : IRequest<Result>
     {
         public string? RoleName { get; set; }
-        public int AddedBy { get; set; }
-        public int ModifiedBy { get; set; }
-        public List<string>? Permission { get; set; }
+        public int? AddedBy { get; set; }
+        public int? ModifiedBy { get; set; }
+        public List<string>? Permissions { get; set; }
     }
 
     public class Handler : IRequestHandler<AddNewUserRoleCommand, Result>
@@ -69,9 +69,9 @@ public class AddNewUserRole : ControllerBase
                     UserRoleName = request.RoleName,
                     AddedBy = request.AddedBy,
                     ModifiedBy = request.ModifiedBy,
-                    Permissions = request.Permission
+                    Permissions = request.Permissions
                 };
-                await _context.UserRoles.AddAsync(newRole, cancellationToken);
+                await _context.UserRoles.AddAsync(newRole, cancellationToken);  
                 await _context.SaveChangesAsync(cancellationToken);
                 return Result.Success();
             }

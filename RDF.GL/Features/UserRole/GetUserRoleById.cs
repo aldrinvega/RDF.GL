@@ -37,8 +37,8 @@ public class GetUserRoleById(IMediator _mediator) : ControllerBase
         public List<string> Permissions { get; set; }
         public string CreatedAt { get; set; }
         public string? UpdatedAt { get; set; }
-        public int AddedBy { get; set; }
-        public int ModifiedBy { get; set; }
+        public int? AddedBy { get; set; }
+        public int? ModifiedBy { get; set; }
         public bool IsActive { get; set; }
     }
 

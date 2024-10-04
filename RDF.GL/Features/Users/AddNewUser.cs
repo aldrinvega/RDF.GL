@@ -66,8 +66,6 @@ public class AddNewUser : ControllerBase
                 return UserErrors.UsernameAlreadyExist(request.Username);
             }
 
-            
-
             var newUser = new Domain.Users
             {
                 FirstName = request.FirstName,

@@ -22,6 +22,288 @@ namespace RDF.GL.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("RDF.GL.Domain.GeneralLedger", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AccountGroup")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("account_group");
+
+                    b.Property<string>("AccountSubGroup")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("account_sub_group");
+
+                    b.Property<string>("AccountTitle")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("account_title");
+
+                    b.Property<string>("AccountTitleCode")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("account_title_code");
+
+                    b.Property<string>("AccountType")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("account_type");
+
+                    b.Property<string>("AccountingTag")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("accounting_tag");
+
+                    b.Property<int>("AddedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("added_by");
+
+                    b.Property<string>("Allocation")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("allocation");
+
+                    b.Property<string>("Asset")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("asset");
+
+                    b.Property<string>("AssetCIP")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("asset_cip");
+
+                    b.Property<string>("AssetCode")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("asset_code");
+
+                    b.Property<string>("BOA")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("boa");
+
+                    b.Property<string>("BOA2")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("boa2");
+
+                    b.Property<string>("Batch")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("batch");
+
+                    b.Property<string>("Books")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("books");
+
+                    b.Property<string>("ChangeTo")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("change_to");
+
+                    b.Property<string>("CheckingRemarks")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("checking_remarks");
+
+                    b.Property<string>("ClientSupplier")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("client_supplier");
+
+                    b.Property<string>("Company")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("company");
+
+                    b.Property<string>("CompanyCode")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("company_code");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("DRCP")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("drcp");
+
+                    b.Property<string>("Department")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("department");
+
+                    b.Property<string>("DepartmentCode")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("department_code");
+
+                    b.Property<string>("DepreciationDescription")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("depreciation_description");
+
+                    b.Property<string>("Division")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("division");
+
+                    b.Property<string>("DivisionCode")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("division_code");
+
+                    b.Property<string>("FarmType")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("farm_type");
+
+                    b.Property<string>("FinancialStatement")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("financial_statement");
+
+                    b.Property<string>("From")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("from");
+
+                    b.Property<string>("ItemCode")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("item_code");
+
+                    b.Property<string>("ItemDescription")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("item_description");
+
+                    b.Property<string>("JeanRemarks")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("jean_remarks");
+
+                    b.Property<decimal?>("LineAmount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("line_amount");
+
+                    b.Property<string>("Location")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("location");
+
+                    b.Property<string>("LocationCode")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("location_code");
+
+                    b.Property<string>("Mark1")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("mark1");
+
+                    b.Property<string>("Mark2")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("mark2");
+
+                    b.Property<string>("Month")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("month");
+
+                    b.Property<string>("Month2")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("month2");
+
+                    b.Property<string>("PONumber")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("po_number");
+
+                    b.Property<string>("Particulars")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("particulars");
+
+                    b.Property<string>("PayrollPeriod")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("payroll_period");
+
+                    b.Property<string>("PayrollType")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("payroll_type");
+
+                    b.Property<string>("PayrollType2")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("payroll_type2");
+
+                    b.Property<string>("Position")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("position");
+
+                    b.Property<decimal?>("Quantity")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("quantity");
+
+                    b.Property<string>("Reason")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("reason");
+
+                    b.Property<string>("ReferenceNo")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("reference_no");
+
+                    b.Property<string>("RemainingDepreciationValue")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("remaining_depreciation_value");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("remarks");
+
+                    b.Property<string>("ServiceProvider")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("service_provider");
+
+                    b.Property<string>("ServiceProviderCode")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("service_provider_code");
+
+                    b.Property<string>("SubUnit")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("sub_unit");
+
+                    b.Property<string>("SubUnitCode")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("sub_unit_code");
+
+                    b.Property<int>("SyncId")
+                        .HasColumnType("int")
+                        .HasColumnName("sync_id");
+
+                    b.Property<string>("System")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("system");
+
+                    b.Property<DateTime>("TransactionDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("transaction_date");
+
+                    b.Property<string>("UOM")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("uom");
+
+                    b.Property<string>("Unit")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("unit");
+
+                    b.Property<string>("UnitCode")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("unit_code");
+
+                    b.Property<decimal?>("UnitPrice")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("unit_price");
+
+                    b.Property<string>("UnitResponsible")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("unit_responsible");
+
+                    b.Property<string>("UsefulLife")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("useful_life");
+
+                    b.Property<string>("VoucherJournal")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("voucher_journal");
+
+                    b.Property<string>("Year")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("year");
+
+                    b.HasKey("Id")
+                        .HasName("pk_general_ledgers");
+
+                    b.HasIndex("AddedBy")
+                        .HasDatabaseName("ix_general_ledgers_added_by");
+
+                    b.ToTable("general_ledgers", (string)null);
+                });
+
             modelBuilder.Entity("RDF.GL.Domain.UserRole", b =>
                 {
                     b.Property<int>("Id")
@@ -31,7 +313,7 @@ namespace RDF.GL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AddedBy")
+                    b.Property<int?>("AddedBy")
                         .HasColumnType("int")
                         .HasColumnName("added_by");
 
@@ -43,7 +325,7 @@ namespace RDF.GL.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("is_active");
 
-                    b.Property<int>("ModifiedBy")
+                    b.Property<int?>("ModifiedBy")
                         .HasColumnType("int")
                         .HasColumnName("modified_by");
 
@@ -69,6 +351,17 @@ namespace RDF.GL.Migrations
                         .HasDatabaseName("ix_user_roles_modified_by");
 
                     b.ToTable("user_roles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2024, 9, 25, 1, 9, 28, 636, DateTimeKind.Utc).AddTicks(4176),
+                            IsActive = true,
+                            Permissions = "[\"User Management\"]",
+                            UpdatedAt = new DateTime(2024, 9, 25, 1, 9, 28, 636, DateTimeKind.Utc).AddTicks(4182),
+                            UserRoleName = "Admin"
+                        });
                 });
 
             modelBuilder.Entity("RDF.GL.Domain.Users", b =>
@@ -135,6 +428,31 @@ namespace RDF.GL.Migrations
                         .HasDatabaseName("ix_users_user_role_id");
 
                     b.ToTable("users", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2024, 9, 25, 9, 9, 28, 636, DateTimeKind.Local).AddTicks(3036),
+                            FirstName = "Admin",
+                            IsActive = true,
+                            Password = "$2a$11$tQRdT7sMfdaASs5uw1uFH.8TFWsMP/Nq98AjUQVmnblWAiiEwmR/y",
+                            UpdatedAt = new DateTime(2024, 9, 25, 1, 9, 28, 478, DateTimeKind.Utc).AddTicks(3882),
+                            UserRoleId = 1,
+                            Username = "admin"
+                        });
+                });
+
+            modelBuilder.Entity("RDF.GL.Domain.GeneralLedger", b =>
+                {
+                    b.HasOne("RDF.GL.Domain.Users", "AddedByUser")
+                        .WithMany()
+                        .HasForeignKey("AddedBy")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_general_ledgers_users_added_by");
+
+                    b.Navigation("AddedByUser");
                 });
 
             modelBuilder.Entity("RDF.GL.Domain.UserRole", b =>
@@ -142,15 +460,11 @@ namespace RDF.GL.Migrations
                     b.HasOne("RDF.GL.Domain.Users", "AddedByUser")
                         .WithMany()
                         .HasForeignKey("AddedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
                         .HasConstraintName("fk_user_roles_users_added_by");
 
                     b.HasOne("RDF.GL.Domain.Users", "ModifiedByUser")
                         .WithMany()
                         .HasForeignKey("ModifiedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
                         .HasConstraintName("fk_user_roles_users_modified_by");
 
                     b.Navigation("AddedByUser");

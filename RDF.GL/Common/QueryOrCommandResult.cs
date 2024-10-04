@@ -3,33 +3,42 @@ namespace RDF.GL.Common;
 
 public class Result
 {
-    protected internal Result(bool isSuccess, Error error)
+    protected internal Result(bool isSuccess, bool isWarning, Error error, string message)
     {
-        switch (isSuccess)
-        {
-            case true when error != Error.None:
+           if (isSuccess && !isWarning && error != Error.None)
+            {
                 throw new InvalidOperationException();
-            case false when error == Error.None:
+            }
+            else if (!isSuccess && !isWarning && error == Error.None)
+            {
                 throw new InvalidOperationException();
-            default:
+            }
+            else
+            {
                 IsSuccess = isSuccess;
+                IsWarning = isWarning;
                 Error = error;
-                break;
-        }
+                Message = message;
+            
+            }
     }
     public bool IsSuccess { get; }
+    public bool IsWarning { get; set; }
+    public string Message { get; set; }
 
     public bool IsFailure => !IsSuccess;
 
     public Error Error { get; }
 
-    public static Result Success() => new(true, Error.None);
+    public static Result Success() => new(true, true, Error.None, "");
 
-    public static Result<TValue> Success<TValue>(TValue data) => new(data, true, Error.None);
+    public static Result<TValue> Success<TValue>(TValue data) => new(data, true, false, Error.None, "");
 
-    public static Result Failure(Error error) => new(false, error);
+    public static Result<TValue> Warning<TValue>(TValue data, string message) => new(data, false, true, Error.None, message);
 
-    public static Result<TValue> Failure<TValue>(Error error) => new(default, false, error);
+    public static Result Failure(Error error) => new(false, false, error, "");
+
+    public static Result<TValue> Failure<TValue>(Error error) => new(default, false, false, error, "");
 
     public static Result Create(bool condition) => condition ? Success() : Failure(Error.ConditionNotMet);
 
@@ -40,12 +49,12 @@ public class Result<TValue> : Result
 {
     private readonly TValue? _value;
 
-    protected internal Result(TValue? data, bool isSuccess, Error error)
-        : base(isSuccess, error) =>
+    protected internal Result(TValue? data, bool isSuccess, bool isWarning, Error error, string message)
+        : base(isSuccess, isWarning, error, message) =>
         _value = data;
 
-    public TValue Value => IsSuccess
-        ? _value!
+    public TValue? Value => IsSuccess
+        ? _value! : IsWarning ? _value
         : throw new InvalidOperationException("The value of a failure result can not be accessed.");
 
     public static implicit operator Result<TValue>(TValue? data) => Create(data);

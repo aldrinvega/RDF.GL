@@ -11,11 +11,15 @@ namespace RDF.GL.Features.Users;
 public class UpdateUserStatus(IMediator _mediator) : ControllerBase
 {
     [HttpPatch("{id:int}")]
-    public async Task<IActionResult> Patch([FromBody] UpdateUserStatusCommand request, [FromRoute] int id)
+    public async Task<IActionResult> Patch([FromRoute] int id)
     {
         try
         {
-            request.Id = id;
+            var request = new UpdateUserStatusCommand 
+            {
+                Id = id
+            };
+
             var result = await _mediator.Send(request);
 
             return result.IsSuccess ? Ok(result) : BadRequest(result);

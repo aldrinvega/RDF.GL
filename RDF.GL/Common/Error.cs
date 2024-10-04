@@ -10,4 +10,5 @@ public record Error(string Code, string Message)
 
     public static implicit operator Result(Error error) => Result.Failure(error);
     public Result ToResult() => Result.Failure(this);
+
 }
