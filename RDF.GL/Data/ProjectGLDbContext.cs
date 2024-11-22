@@ -11,6 +11,7 @@ public class ProjectGLDbContext :DbContext
     public virtual DbSet<Users> Users { get; set; }
     public virtual DbSet<UserRole> UserRoles { get; set; }
     public virtual DbSet<GeneralLedger> GeneralLedgers { get; set; }
+    public virtual DbSet<Domain.System> Systems { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using RDF.Arcana.API.Common;
-using RDF.Arcana.API.Common.Behaviors;
+using RDF.GL.Common.Behaviors;
 using RDF.GL.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -145,7 +145,7 @@ app.UseAuthentication();
 app.UseAuthentication();
 app.UseHttpsRedirection();
 app.UseCors(clientPermission);
-//app.ApplyMigrations();
+app.ApplyMigrations();
 app.UseAuthorization();
 
 app.MapControllers();

@@ -83,6 +83,10 @@ namespace RDF.GL.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("boa2");
 
+                    b.Property<string>("BankName")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("bank_name");
+
                     b.Property<string>("Batch")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("batch");
@@ -98,6 +102,14 @@ namespace RDF.GL.Migrations
                     b.Property<string>("CheckingRemarks")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("checking_remarks");
+
+                    b.Property<string>("ChequeNumber")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("cheque_number");
+
+                    b.Property<string>("ChequeVoucherNumber")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("cheque_voucher_number");
 
                     b.Property<string>("ClientSupplier")
                         .HasColumnType("nvarchar(max)")
@@ -219,6 +231,10 @@ namespace RDF.GL.Migrations
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("quantity");
 
+                    b.Property<string>("RRNumber")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("rr_number");
+
                     b.Property<string>("Reason")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("reason");
@@ -251,8 +267,8 @@ namespace RDF.GL.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("sub_unit_code");
 
-                    b.Property<int>("SyncId")
-                        .HasColumnType("int")
+                    b.Property<string>("SyncId")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("sync_id");
 
                     b.Property<string>("System")
@@ -302,6 +318,37 @@ namespace RDF.GL.Migrations
                         .HasDatabaseName("ix_general_ledgers_added_by");
 
                     b.ToTable("general_ledgers", (string)null);
+                });
+
+            modelBuilder.Entity("RDF.GL.Domain.System", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Endpoint")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("endpoint");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_active");
+
+                    b.Property<string>("SystemName")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("system_name");
+
+                    b.Property<string>("Token")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("token");
+
+                    b.HasKey("Id")
+                        .HasName("pk_systems");
+
+                    b.ToTable("systems", (string)null);
                 });
 
             modelBuilder.Entity("RDF.GL.Domain.UserRole", b =>
@@ -356,10 +403,10 @@ namespace RDF.GL.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 9, 25, 1, 9, 28, 636, DateTimeKind.Utc).AddTicks(4176),
+                            CreatedAt = new DateTime(2024, 11, 2, 13, 12, 1, 878, DateTimeKind.Utc).AddTicks(7406),
                             IsActive = true,
                             Permissions = "[\"User Management\"]",
-                            UpdatedAt = new DateTime(2024, 9, 25, 1, 9, 28, 636, DateTimeKind.Utc).AddTicks(4182),
+                            UpdatedAt = new DateTime(2024, 11, 2, 13, 12, 1, 878, DateTimeKind.Utc).AddTicks(7415),
                             UserRoleName = "Admin"
                         });
                 });
@@ -433,11 +480,11 @@ namespace RDF.GL.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 9, 25, 9, 9, 28, 636, DateTimeKind.Local).AddTicks(3036),
+                            CreatedAt = new DateTime(2024, 11, 2, 21, 12, 1, 878, DateTimeKind.Local).AddTicks(6555),
                             FirstName = "Admin",
                             IsActive = true,
-                            Password = "$2a$11$tQRdT7sMfdaASs5uw1uFH.8TFWsMP/Nq98AjUQVmnblWAiiEwmR/y",
-                            UpdatedAt = new DateTime(2024, 9, 25, 1, 9, 28, 478, DateTimeKind.Utc).AddTicks(3882),
+                            Password = "$2a$11$0dtXK8PdkfCsWQT9WgtsnucEYUWs77U.KTaTQ85.P6i6m1B3NbQWG",
+                            UpdatedAt = new DateTime(2024, 11, 2, 13, 12, 1, 723, DateTimeKind.Utc).AddTicks(8639),
                             UserRoleId = 1,
                             Username = "admin"
                         });

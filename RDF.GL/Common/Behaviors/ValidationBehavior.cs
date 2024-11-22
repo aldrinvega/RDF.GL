@@ -3,19 +3,12 @@ using MediatR;
 using RDF.GL.Common.Exceptions;
 using RDF.GL.Common.Messaging;
 
-namespace RDF.Arcana.API.Common.Behaviors;
+namespace RDF.GL.Common.Behaviors;
 
-public sealed class ValidationBehavior<TRequest, TResponse> :
+public sealed class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValidator<TRequest>> validators) :
     IPipelineBehavior<TRequest, TResponse>
     where TRequest : ICommandBase
 {
-    private readonly IEnumerable<IValidator<TRequest>> _validators;
-
-    public ValidationBehavior(IEnumerable<IValidator<TRequest>> validators)
-    {
-        _validators = validators;
-    }
-
     public async Task<TResponse> Handle(
         TRequest request,
         RequestHandlerDelegate<TResponse> next,
@@ -24,7 +17,7 @@ public sealed class ValidationBehavior<TRequest, TResponse> :
         var context = new ValidationContext<TRequest>(request);
 
         var validationFailures = await Task.WhenAll(
-            _validators.Select(validator => validator.ValidateAsync(context, cancellationToken)));
+            validators.Select(validator => validator.ValidateAsync(context, cancellationToken)));
 
         var errors = validationFailures.Where(validationResult => !validationResult.IsValid)
             .SelectMany(validationResult => validationResult.Errors)
@@ -33,9 +26,9 @@ public sealed class ValidationBehavior<TRequest, TResponse> :
                 validationFailure.ErrorMessage
             )).ToList();
 
-        if (errors.Any())
+        if (errors.Count != 0)
         {
-            throw new GL.Common.Exceptions.ValidationException(errors);
+            throw new Exceptions.ValidationException(errors);
         }
 
         var response = await next();
