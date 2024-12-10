@@ -15,6 +15,8 @@ public class ProjectGLDbContext :DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<GeneralLedger>().Property(gl => gl.LineAmount).HasPrecision(20, 10);
+        
         // Seed the Users table
         modelBuilder.Entity<Users>().HasData(new Users
         {

@@ -51,7 +51,9 @@ public class GenerateVerticalCashDisbursementBookPerMonth(IMediator mediator) : 
             CancellationToken cancellationToken)
         {
             var glReports = await context.GeneralLedgers.Where(gl =>
-                    gl.Month == request.Month && gl.Year == request.Year && gl.System == request.System)
+                    gl.Month == request.Month && 
+                    gl.Year == request.Year &&
+                    gl.BOA == "Cash Disbursement Book")
                 .ToListAsync(cancellationToken: cancellationToken);
 
             var cashDisbursementBook = glReports.Select(cdb => new GenerateCashDisbursementBookPerMonthResponse

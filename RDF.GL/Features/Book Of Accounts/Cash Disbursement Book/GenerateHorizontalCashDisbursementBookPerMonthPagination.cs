@@ -86,7 +86,7 @@ public class GenerateHorizontalCashDisbursementBookPerMonthPagination(IMediator 
             var cashDisbursementBook = context.GeneralLedgers
                 .Where(gl => gl.Month == request.Month)
                 .Where(gl => gl.Year == request.Year)
-                .Where(gl => gl.System == Common.System.Fisto)
+                .Where(gl => gl.BOA == "Cash Disbursement Book")
                 .GroupBy(gl => new
                 {
                     gl.Month,

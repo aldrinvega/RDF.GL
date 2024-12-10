@@ -176,7 +176,8 @@ namespace RDF.GL.Migrations
                         .HasColumnName("jean_remarks");
 
                     b.Property<decimal?>("LineAmount")
-                        .HasColumnType("decimal(18,2)")
+                        .HasPrecision(20, 10)
+                        .HasColumnType("decimal(20,10)")
                         .HasColumnName("line_amount");
 
                     b.Property<string>("Location")
@@ -403,10 +404,10 @@ namespace RDF.GL.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 11, 2, 13, 12, 1, 878, DateTimeKind.Utc).AddTicks(7406),
+                            CreatedAt = new DateTime(2024, 12, 10, 1, 11, 7, 965, DateTimeKind.Utc).AddTicks(4771),
                             IsActive = true,
                             Permissions = "[\"User Management\"]",
-                            UpdatedAt = new DateTime(2024, 11, 2, 13, 12, 1, 878, DateTimeKind.Utc).AddTicks(7415),
+                            UpdatedAt = new DateTime(2024, 12, 10, 1, 11, 7, 965, DateTimeKind.Utc).AddTicks(4779),
                             UserRoleName = "Admin"
                         });
                 });
@@ -480,11 +481,11 @@ namespace RDF.GL.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 11, 2, 21, 12, 1, 878, DateTimeKind.Local).AddTicks(6555),
+                            CreatedAt = new DateTime(2024, 12, 10, 9, 11, 7, 965, DateTimeKind.Local).AddTicks(3873),
                             FirstName = "Admin",
                             IsActive = true,
-                            Password = "$2a$11$0dtXK8PdkfCsWQT9WgtsnucEYUWs77U.KTaTQ85.P6i6m1B3NbQWG",
-                            UpdatedAt = new DateTime(2024, 11, 2, 13, 12, 1, 723, DateTimeKind.Utc).AddTicks(8639),
+                            Password = "$2a$11$M6/biOIKiFedaQXOwee6t.4vgTtHI3.O3.RxCsOxnnsWIHPwz2ixq",
+                            UpdatedAt = new DateTime(2024, 12, 10, 1, 11, 7, 813, DateTimeKind.Utc).AddTicks(3189),
                             UserRoleId = 1,
                             Username = "admin"
                         });

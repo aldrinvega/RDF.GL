@@ -22,7 +22,7 @@ public class GenerateTrialBalancePerMonthPagination(IMediator mediator) : Contro
             Response.AddPaginationHeader(
                 trialBalance.CurrentPage, 
                 trialBalance.PageSize, 
-                trialBalance.TotalCount, 
+                trialBalance.TotalCount,
                 trialBalance.TotalPages,
                 trialBalance.HasPreviousPage,
                 trialBalance.HasNextPage
@@ -52,7 +52,6 @@ public class GenerateTrialBalancePerMonthPagination(IMediator mediator) : Contro
         public string Search { get; set; }
         public string Month { get; set; }
         public string Year { get; set; }
-        public string System { get; set; }
     }
     
     public class GenerateTrialBalancePerMonthPaginationResponse
@@ -62,7 +61,7 @@ public class GenerateTrialBalancePerMonthPagination(IMediator mediator) : Contro
         public string ReferenceNumber { get; set; }
         public decimal? Amount { get; set; }
         public string ChartOfAccount { get; set; }
-        public decimal? Decimal { get; set; }
+        public decimal? Debit { get; set; }
         public decimal? Credit { get; set; }
         public string DrCr { get; set; }
     }
@@ -74,20 +73,23 @@ public class GenerateTrialBalancePerMonthPagination(IMediator mediator) : Contro
         {
             IQueryable<GeneralLedger> trialBalance = context.GeneralLedgers
                 .Where(gl => gl.Month == request.Month)
-                .Where(gl => gl.Year == request.Year)
-                .Where(gl => gl.System == request.System);
-            
+                .Where(gl => gl.Year == request.Year);
+
             var result = trialBalance
-                .Select(tb => new GenerateTrialBalancePerMonthPaginationResponse
+                .GroupBy(x => new
                 {
-                    Date = tb.TransactionDate.ToString("MM/dd/yyyy"),
-                    CustomerName = tb.ClientSupplier,
-                    ReferenceNumber = tb.ReferenceNo,
-                    Amount = tb.LineAmount < 0 ? tb.LineAmount : 0,
-                    ChartOfAccount = tb.AccountTitle,
-                    Decimal = tb.LineAmount < 0 ? tb.LineAmount : 0,
-                    Credit = tb.LineAmount > 0 ? tb.LineAmount : 0,
-                    DrCr = tb.DRCP
+                    x.AccountTitle
+                })
+                .Select(gl => new GenerateTrialBalancePerMonthPaginationResponse
+                {
+                    Date = gl.First().TransactionDate.ToString("MM/dd/yyyy"),
+                    CustomerName = gl.First().ClientSupplier,
+                    ReferenceNumber = gl.First().ReferenceNo,
+                    Amount = gl.Sum(tb => tb.LineAmount > 0 ? tb.LineAmount : 0),
+                    ChartOfAccount = gl.Key.AccountTitle,
+                    Debit = gl.Sum(tb => tb.LineAmount > 0 ? tb.LineAmount : 0),
+                    Credit = gl.Sum(tb => tb.LineAmount < 0 ? tb.LineAmount : 0),
+                    DrCr = gl.First().DRCP
                 });
             
             return await PagedList<GenerateTrialBalancePerMonthPaginationResponse>.CreateAsync(result, request.PageNumber, request.PageSize);

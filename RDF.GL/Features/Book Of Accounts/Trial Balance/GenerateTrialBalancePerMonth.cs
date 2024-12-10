@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Primitives;
 using RDF.GL.Common;
@@ -6,14 +7,35 @@ using RDF.GL.Data;
 
 namespace RDF.GL.Features.Book_Of_Accounts.Trial_Balance;
 
-public class GenerateTrialBalancePerMonth
+[Route("api/bookofaccounts"), ApiController]
+public class GenerateTrialBalancePerMonth : ControllerBase
 {
+    private readonly IMediator _mediator;
+
+    public GenerateTrialBalancePerMonth(IMediator mediator)
+    {
+        _mediator = mediator;
+    }
+
+    [HttpGet("trialbalance")]
+    public async Task<IActionResult> Get([FromQuery] GenerateTrialBalancePerMonthCommand request)
+    {
+        try
+        {
+            var trialBalance = await _mediator.Send(request);
+            return trialBalance.IsFailure ? BadRequest(trialBalance) : Ok(trialBalance);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
     public class GenerateTrialBalancePerMonthCommand : IRequest<Result>
     {
         public string Search { get; set; }
-        public string Month { get; set; }
+        public string From { get; set; }
+        public string To { get; set; }
         public string Year { get; set; }
-        public string System { get; set; }
     }
     
     public record GenerateTrialBalancePerMonthResponse
@@ -23,7 +45,7 @@ public class GenerateTrialBalancePerMonth
         public string ReferenceNumber { get; set; }
         public decimal? Amount { get; set; }
         public string ChartOfAccount { get; set; }
-        public decimal? Decimal { get; set; }
+        public decimal? Debit { get; set; }
         public decimal? Credit { get; set; }
         public string Drcr { get; set; }
     }
@@ -34,19 +56,22 @@ public class GenerateTrialBalancePerMonth
             CancellationToken cancellationToken)
         {
             var trialBalance = await context.GeneralLedgers
-                .Where(gl => gl.Month == request.Month)
+                .Where(gl => gl.Month == request.From || gl.Month == request.To)
                 .Where(gl => gl.Year == request.Year)
-                .Where(gl => gl.System == request.System)
+                .GroupBy(x => new
+                {
+                    x.AccountTitle
+                })
                 .Select(gl => new GenerateTrialBalancePerMonthResponse
                 {
-                    Date = gl.TransactionDate.ToString("MM/dd/yyyy"),
-                    CustomerName = gl.ClientSupplier,
-                    ReferenceNumber = gl.ReferenceNo,
-                    Amount = gl.LineAmount > 0 ? gl.LineAmount : 0,
-                    ChartOfAccount = gl.AccountTitle,
-                    Decimal = gl.LineAmount > 0 ? gl.LineAmount : 0,
-                    Credit = gl.LineAmount < 0 ? gl.LineAmount : 0,
-                    Drcr = gl.DRCP
+                    Date = gl.First().TransactionDate.ToString("MM/dd/yyyy"),
+                    CustomerName = gl.First().ClientSupplier,
+                    ReferenceNumber = gl.First().ReferenceNo,
+                    Amount = gl.Sum(tb => tb.LineAmount > 0 ? tb.LineAmount : 0),
+                    ChartOfAccount = gl.Key.AccountTitle,
+                    Debit = gl.Sum( tb => tb.LineAmount > 0 ? tb.LineAmount : 0),
+                    Credit = gl.Sum( tb => tb.LineAmount < 0 ? tb.LineAmount : 0),
+                    Drcr = gl.First().DRCP
                 })
                 .ToListAsync(cancellationToken: cancellationToken);
 

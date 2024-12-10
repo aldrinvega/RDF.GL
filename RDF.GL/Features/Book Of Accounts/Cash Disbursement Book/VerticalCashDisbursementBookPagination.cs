@@ -75,7 +75,7 @@ public class VerticalCashDisbursementBookPagination(IMediator mediator) : Contro
             VerticalCashDisbursementBookPaginationCommand request, CancellationToken cancellationToken)
         {
             var cashDisbursementBook = context.GeneralLedgers
-                .Where(cgb => cgb.System == request.System && cgb.Month == request.Month && cgb.Year == request.Year);
+                .Where(cgb => cgb.BOA == "Cash Disbursement Book" && cgb.Month == request.Month && cgb.Year == request.Year);
 
             if (!string.IsNullOrEmpty(request.Search))
             {

@@ -47,7 +47,9 @@ public class GenerateSalesJournalPerMonth(IMediator mediator) : ControllerBase
             var salesJournal = await context.GeneralLedgers
                 .Where(gl => gl.Month == request.Month)
                 .Where(gl => gl.Year == request.Year)
-                .Where(gl => gl.System == request.System)
+                .Where(gl => gl.System == request.System ||
+                             gl.System == Common.System.Manual ||
+                             gl.BOA == "Sales Journal")
                 .ToListAsync(cancellationToken: cancellationToken);
             
             var result = salesJournal.Select(sj => new GenerateSalesJournalPerMonthResponse

@@ -50,7 +50,8 @@ public class GenerateVerticalPurchasesBookPerMonthPagination(IMediator mediator)
         IRequest<PagedList<GeneratePurchasesBookPerMonthPaginationResponse>>
     {
         public string Search { get; set; }
-        public string Month { get; set; }
+        public int From { get; set; }
+        public int To { get; set; }
         public string Year { get; set; }
     }
 
@@ -58,6 +59,8 @@ public class GenerateVerticalPurchasesBookPerMonthPagination(IMediator mediator)
     {
         public string GlDate { get; set; }
         public string TransactionDate { get; set; }
+        public string Month { get; set; }
+        public string Year { get; set; }
         public string NameOfSupplier { get; set; }
         public string Description { get; set; }
         public string PoNumber { get; set; }
@@ -77,26 +80,58 @@ public class GenerateVerticalPurchasesBookPerMonthPagination(IMediator mediator)
             GenerateVerticalPurchasesBookPerMonthPaginationCommand request, CancellationToken cancellationToken)
         {
             IQueryable<GeneralLedger> purchasesBook = context.GeneralLedgers
-                .Where(gl => gl.Month == request.Month)
                 .Where(gl => gl.Year == request.Year)
                 .Where(gl => gl.System == Common.System.Ymir ||
                              gl.System == Common.System.Stalwart ||
-                             gl.System == Common.System.Fisto);
+                             gl.System == Common.System.Fisto ||
+                             gl.System == Common.System.Manual &&
+                             gl.BOA == "Purchases Book");
+
             if (!string.IsNullOrEmpty(request.Search))
             {
                 purchasesBook = purchasesBook.Where(gl => gl.ItemDescription.Contains(request.Search));
             }
 
-            var result = purchasesBook.Select(pb => new GeneratePurchasesBookPerMonthPaginationResponse
+            var monthRangeQuery = purchasesBook
+                .Where(gl =>
+                        (gl.Month == "JAN" ? 1 :
+                        gl.Month == "FEB" ? 2 :
+                        gl.Month == "MAR" ? 3 :
+                        gl.Month == "APR" ? 4 :
+                        gl.Month == "MAY" ? 5 :
+                        gl.Month == "JUN" ? 6 :
+                        gl.Month == "JUL" ? 7 :
+                        gl.Month == "AUG" ? 8 :
+                        gl.Month == "SEP" ? 9 :
+                        gl.Month == "OCT" ? 10 :
+                        gl.Month == "NOV" ? 11 :
+                        gl.Month == "DEC" ? 12 : 0) >= request.From &&
+                        (gl.Month == "JAN" ? 1 :
+                        gl.Month == "FEB" ? 2 :
+                        gl.Month == "MAR" ? 3 :
+                        gl.Month == "APR" ? 4 :
+                        gl.Month == "MAY" ? 5 :
+                        gl.Month == "JUN" ? 6 :
+                        gl.Month == "JUL" ? 7 :
+                        gl.Month == "AUG" ? 8 :
+                        gl.Month == "SEP" ? 9 :
+                        gl.Month == "OCT" ? 10 :
+                        gl.Month == "NOV" ? 11 :
+                        gl.Month == "DEC" ? 12 : 0) <= request.To);
+
+            var result = monthRangeQuery.Select(pb => new GeneratePurchasesBookPerMonthPaginationResponse
             {
                 GlDate = $"{pb.Month}. {pb.Year}",
+                Month = pb.Month,
+                Year = pb.Year,
                 TransactionDate = pb.TransactionDate.ToString("yyyy-MM-dd"),
                 NameOfSupplier = pb.ClientSupplier,
                 Description = pb.ItemDescription,
+                Apv = pb.VoucherJournal,
                 PoNumber = pb.PONumber,
                 RrNumber = pb.RRNumber,
                 ReceiptNumber = pb.ReferenceNo,
-                Amount = pb.LineAmount,
+                Amount = pb.LineAmount > 0 ? pb.LineAmount.Value : 0,
                 NameOfAccount = pb.AccountTitle,
                 DrCr = pb.DRCP
             });
@@ -104,5 +139,6 @@ public class GenerateVerticalPurchasesBookPerMonthPagination(IMediator mediator)
             return await PagedList<GeneratePurchasesBookPerMonthPaginationResponse>.CreateAsync(result,
                 request.PageNumber, request.PageSize);
         }
+
     }
 }

@@ -25,7 +25,8 @@ public class GenerateVerticalPurchasesBookPerMonth(IMediator mediator) : Control
     
     public class GeneratePurchasesBookPerMonthCommand : IRequest<Result>
     {
-        public string Month { get; set; }
+        public int From { get; set; }
+        public int To { get; set; }
         public string Year { get; set; }
     }
 
@@ -51,13 +52,23 @@ public class GenerateVerticalPurchasesBookPerMonth(IMediator mediator) : Control
     {
         public async Task<Result> Handle(GeneratePurchasesBookPerMonthCommand request, CancellationToken cancellationToken)
         {
-            var purchasesBook = await context.GeneralLedgers
-                .Where(gl => gl.Month == request.Month)
-                .Where(gl => gl.Year == request.Year)
-                .Where(gl => gl.System == Common.System.Ymir || 
-                             gl.System == Common.System.Stalwart || 
-                             gl.System == Common.System.Fisto)
-                .ToListAsync(cancellationToken);
+            var monthMapping = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+            {
+                { "JAN", 01 }, { "FEB", 02 }, { "MAR", 03 }, { "APR", 04 },
+                { "MAY", 05 }, { "JUN", 06 }, { "JUL", 07 }, { "AUG", 08 },
+                { "SEP", 09 }, { "OCT", 10 }, { "NOV", 11 }, { "DEC", 12 }
+            };
+            
+            var purchasesBook = (await context.GeneralLedgers
+                    .Where(gl => gl.Year == request.Year)
+                    .Where(gl => gl.System == Common.System.Ymir || 
+                                 gl.System == Common.System.Stalwart || 
+                                 gl.System == Common.System.Fisto ||    
+                                 gl.System == Common.System.Manual &&
+                                 gl.BOA == "Purchases Book")
+                    .ToListAsync(cancellationToken))
+                .Where(gl => monthMapping[gl.Month] >= request.From && monthMapping[gl.Month] <= request.To)
+                .ToList();
 
             var result = purchasesBook.Select(pb => new GeneratePurchasesBookPerMonthResponse
             {
@@ -66,13 +77,13 @@ public class GenerateVerticalPurchasesBookPerMonth(IMediator mediator) : Control
                 NameOfSupplier = pb.ClientSupplier,
                 Description = pb.ItemDescription,
                 PoNumber = pb.PONumber,
-                Apv = pb.ChequeVoucherNumber,
+                Apv = pb.VoucherJournal,
                 RrNumber = pb.RRNumber,
                 ReceiptNumber = pb.ReferenceNo,
                 Amount = pb.LineAmount,
                 NameOfAccount = pb.AccountTitle,
-                Debit = pb.LineAmount > 0 ? pb.LineAmount : 0,
-                Credit = pb.LineAmount < 0 ? pb.LineAmount : 0,
+                Debit = pb.LineAmount > 0 ? pb.LineAmount.Value : 0,
+                Credit = pb.LineAmount < 0 ? pb.LineAmount.Value : 0,
                 DRCR = pb.DRCP
             });
 

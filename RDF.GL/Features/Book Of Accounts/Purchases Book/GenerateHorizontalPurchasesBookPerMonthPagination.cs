@@ -83,7 +83,9 @@ public class GenerateHorizontalPurchasesBookPerMonthPagination(IMediator mediato
                 .Where(gl => gl.Year == request.Year)
                 .Where(gl => gl.System == Common.System.Fisto || 
                              gl.System == Common.System.Ymir || 
-                             gl.System == Common.System.Stalwart) 
+                             gl.System == Common.System.Stalwart ||
+                             gl.System == Common.System.Manual ||
+                             gl.BOA == "Purchases Book") 
                 .GroupBy(gl => new
                 {
                     gl.Month,

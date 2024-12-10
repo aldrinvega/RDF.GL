@@ -74,7 +74,9 @@ public class GenerateSalesJournalPerMonthPagination(IMediator mediator) : Contro
             IQueryable<GeneralLedger> salesJournal = context.GeneralLedgers
                 .Where(gl => gl.Month == request.Month)
                 .Where(gl => gl.Year == request.Year)
-                .Where(gl => gl.System == request.System);
+                .Where(gl => gl.System == request.System ||
+                             gl.System == Common.System.Manual ||
+                             gl.BOA == "Sales Journal");
 
             var result = salesJournal
                 .Select(sj => new GenerateSalesJournalPerMonthPaginationResponse
@@ -83,9 +85,9 @@ public class GenerateSalesJournalPerMonthPagination(IMediator mediator) : Contro
                     CustomerName = sj.ClientSupplier,
                     ReferenceNumber = sj.ReferenceNo,
                     ChartOfAccount = sj.AccountTitle,
-                    LineAmount = sj.LineAmount,
-                    Debit = sj.LineAmount > 0 ? sj.LineAmount : 0,
-                    Credit = sj.LineAmount < 0 ? sj.LineAmount : 0,
+                    LineAmount = sj.LineAmount.HasValue ? Math.Round(sj.LineAmount.Value, 2) : 0,
+                    Debit = sj.LineAmount > 0 ? Math.Round(sj.LineAmount.Value, 2) : 0,
+                    Credit = sj.LineAmount < 0 ? Math.Round(sj.LineAmount.Value, 2) : 0,
                     DrCr = sj.DRCP
                 });
             
