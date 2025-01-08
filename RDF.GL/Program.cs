@@ -12,8 +12,7 @@ using RDF.GL.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
+//MeiatR Dependency Injection
 builder.Services.AddMediatR(x =>
 {
     x.RegisterServicesFromAssemblies(typeof(Program).Assembly);
@@ -30,8 +29,9 @@ builder.Services.AddControllers(
     }
 ).AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
-var connectionString = builder.Configuration.GetConnectionString("Docker");
+var connectionString = builder.Configuration.GetConnectionString("Live");
 
+// Add the database context
 builder.Services.AddDbContext<ProjectGLDbContext>(x =>
 {
     if (connectionString != null)
@@ -42,6 +42,8 @@ builder.Services.AddDbContext<ProjectGLDbContext>(x =>
         }).UseSnakeCaseNamingConvention();
     }
 });
+
+//Swagger Documentation
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -73,18 +75,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-//builder.Services.AddApiVersioning(options =>
-//{
-//    options.DefaultApiVersion = new ApiVersion(1);
-//    options.ApiVersionReader = new UrlSegmentApiVersionReader();
-
-//})
-//    .AddApiExplorer(options =>
-//{
-//    options.GroupNameFormat = "'v'V";
-//    options.SubstituteApiVersionInUrl = true;
-//});
-
+//Add Authentication Services
 builder.Services.AddAuthentication(authOptions =>
 {
     authOptions.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -106,11 +97,12 @@ builder.Services.AddAuthentication(authOptions =>
             ValidIssuer = builder.Configuration["JwtConfig:Issuer"],
             ValidAudience = builder.Configuration["JwtConfig:Audience"]
         };
-        // jwtOptions.EventsType = typeof(MyAuthenticationFailureHandler);
     });
 
 const string clientPermission = "_clientPermission";
 
+
+//CORS Policy
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: clientPermission, policy =>
@@ -121,13 +113,8 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddHttpClient("changeme", m => { }).ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
-    {
-        ServerCertificateCustomValidationCallback = (m, c, ch, e) => true
-    }); ;
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

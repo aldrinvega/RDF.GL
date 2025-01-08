@@ -9,6 +9,7 @@ namespace RDF.GL.Features.Book_Of_Accounts.Cash_Disbursement_Book;
 
 public class GenerateVerticalCashDisbursementBookPerMonth(IMediator mediator) : ControllerBase
 {
+    //Controller for the vertical Cash Disbursement Book
     [HttpGet("cash-disbursement-book/vertical")]
     public async Task<IActionResult> GetCashDisbursementBookPerMonth([FromQuery] GenerateCashDisbursementBookPerMonthCommand request)
     {
@@ -22,12 +23,17 @@ public class GenerateVerticalCashDisbursementBookPerMonth(IMediator mediator) : 
             return BadRequest(e.Message);
         }
     }
+
+    //Vertical Cash Disbursement Book Command
     public class GenerateCashDisbursementBookPerMonthCommand : IRequest<Result>
     {
-        public string Month { get; set; }
-        public string Year { get; set; }
-        public string System { get; set; }
+        public string FromMonth { get; set; }
+        public string ToMonth { get; set; }
+        public string FromYear { get; set; }
+        public string ToYear { get; set; }
     }
+
+    //Vertical Cash Disbursement Book Response
 
     public class GenerateCashDisbursementBookPerMonthResponse
     {
@@ -45,15 +51,17 @@ public class GenerateVerticalCashDisbursementBookPerMonth(IMediator mediator) : 
         public string DrCr { get; set; }
     }
     
+    //Vertical Cash Disbursement Book Handler
     public class Handler(ProjectGLDbContext context) : IRequestHandler<GenerateCashDisbursementBookPerMonthCommand, Result>
     {
         public async Task<Result> Handle(GenerateCashDisbursementBookPerMonthCommand request,
             CancellationToken cancellationToken)
         {
-            var glReports = await context.GeneralLedgers.Where(gl =>
-                    gl.Month == request.Month && 
-                    gl.Year == request.Year &&
-                    gl.BOA == "Cash Disbursement Book")
+            //Query
+            var glReports = await context.GeneralLedgers
+                .Where(gl => string.Compare(gl.Year + "-" + gl.Month, request.FromYear + "-" + request.FromMonth) >= 0
+                             && string.Compare(gl.Year + "-" + gl.Month, request.ToYear + "-" + request.ToMonth) <= 0 &&
+                             gl.BOA == "Cash Disbursement Book")
                 .ToListAsync(cancellationToken: cancellationToken);
 
             var cashDisbursementBook = glReports.Select(cdb => new GenerateCashDisbursementBookPerMonthResponse

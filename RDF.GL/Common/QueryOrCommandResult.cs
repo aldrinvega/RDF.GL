@@ -1,6 +1,9 @@
 ﻿#nullable enable
 namespace RDF.GL.Common;
 
+
+//Result pattern for every response of the API
+
 public class Result
 {
     protected internal Result(bool isSuccess, bool isWarning, Error error, string message)

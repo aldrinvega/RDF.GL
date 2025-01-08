@@ -10,8 +10,10 @@ namespace RDF.GL.Features.Book_Of_Accounts.Cash_Disbursement_Book;
 
 [Route("api/book-of-accounts"), ApiController]
 
+//Vertical 
 public class VerticalCashDisbursementBookPagination(IMediator mediator) : ControllerBase
 {
+    //Contrller for vertical cash disbursement book pagination
     [HttpGet("cash-disbursement-book/vertical/page")]
     public async Task<IActionResult> Get([FromQuery] VerticalCashDisbursementBookPaginationCommand request)
     {
@@ -44,14 +46,19 @@ public class VerticalCashDisbursementBookPagination(IMediator mediator) : Contro
             return BadRequest(e.Message);
         }
     }
+
+    //Vertical cash disbursement book pagination command
     public class VerticalCashDisbursementBookPaginationCommand : UserParams, IRequest<PagedList<CashDisbursementBookPaginationResponse>>
     {
-        public string Search { get; set; }
-        public string Month { get; set; }
-        public string Year { get; set; }
-        public string System { get; set; }
+        public string Search { get; set; }    
+        public string FromMonth { get; set; }   
+        public string ToMonth { get; set; }
+        public string FromYear { get; set; }
+        public string ToYear { get; set; }
+        
     }
 
+    //Cash disbursement book pagination response
     public class CashDisbursementBookPaginationResponse
     {
         public string ChequeDate { get; set; }
@@ -68,6 +75,8 @@ public class VerticalCashDisbursementBookPagination(IMediator mediator) : Contro
         public string DrCr { get; set; }
     }
 
+
+    //Vertical cash disbursement book pagination handler
     public class Handler(ProjectGLDbContext context)
         : IRequestHandler<VerticalCashDisbursementBookPaginationCommand, PagedList<CashDisbursementBookPaginationResponse>>
     {
@@ -75,12 +84,16 @@ public class VerticalCashDisbursementBookPagination(IMediator mediator) : Contro
             VerticalCashDisbursementBookPaginationCommand request, CancellationToken cancellationToken)
         {
             var cashDisbursementBook = context.GeneralLedgers
-                .Where(cgb => cgb.BOA == "Cash Disbursement Book" && cgb.Month == request.Month && cgb.Year == request.Year);
+                .Where(cgb => cgb.BOA == "Cash Disbursement Book"
+                              && string.Compare(cgb.Year + "-" + cgb.Month, request.FromYear + "-" + request.FromMonth) >= 0
+                              && string.Compare(cgb.Year + "-" + cgb.Month, request.ToYear + "-" + request.ToMonth) <= 0);
 
             if (!string.IsNullOrEmpty(request.Search))
             {
                 cashDisbursementBook = cashDisbursementBook.Where(cgb => cgb.ItemDescription.Contains(request.Search));
             }
+            
+            
 
             var result = cashDisbursementBook.Select(cdb => new CashDisbursementBookPaginationResponse
             {

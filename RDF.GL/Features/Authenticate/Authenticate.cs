@@ -22,6 +22,8 @@ public class Authenticate : ControllerBase
         _mediator = mediator;
     }
 
+
+    //Controller
     [AllowAnonymous]
     [HttpPost()]
     public async Task<IActionResult> AuthenticateUser(
@@ -43,6 +45,8 @@ public class Authenticate : ControllerBase
         }
     }
 }
+
+// Query
 public sealed record AuthenticateUserQuery : IRequest<Result>
     {
         public AuthenticateUserQuery(string username)
@@ -54,6 +58,8 @@ public sealed record AuthenticateUserQuery : IRequest<Result>
 
         [Required] public string Password { get; set; }
     }
+
+//Query Response
 
     public class AuthenticateUserResult
     {
@@ -81,12 +87,15 @@ public sealed record AuthenticateUserQuery : IRequest<Result>
         public string ProfilePicture { get; set; }
     }
 
+//Query handler
 public class Handler : IRequestHandler<AuthenticateUserQuery, Result>
 {
 
     private readonly IConfiguration _configuration;
     private readonly ProjectGLDbContext _context;
 
+
+    //Interface Implemented
     public Handler(ProjectGLDbContext context, IConfiguration configuration)
     {
         _context = context;
@@ -97,6 +106,7 @@ public class Handler : IRequestHandler<AuthenticateUserQuery, Result>
         CancellationToken cancellationToken)
     {
 
+        //Query
         var user = await _context.Users
             .Include(x => x.UserRole)
             .SingleOrDefaultAsync(x => x.Username == command.Username, cancellationToken);
@@ -131,6 +141,8 @@ public class Handler : IRequestHandler<AuthenticateUserQuery, Result>
         return Result.Success(result);
     }
 
+
+    //Another method for Generate Token
     private string GenerateJwtToken(Domain.Users user)
     {
         var key = _configuration.GetValue<string>("JwtConfig:Key");

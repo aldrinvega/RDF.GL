@@ -1,5 +1,7 @@
 ﻿namespace RDF.GL.Common;
 
+//Error for Result Patter
+
 public record Error(string Code, string Message)
 {
     public static readonly Error None = new(string.Empty, string.Empty);

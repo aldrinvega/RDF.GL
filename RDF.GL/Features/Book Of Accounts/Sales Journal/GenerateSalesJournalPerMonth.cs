@@ -24,9 +24,10 @@ public class GenerateSalesJournalPerMonth(IMediator mediator) : ControllerBase
     }
     public class GenerateSalesJournalPerMonthCommand : IRequest<Result>
     {
-        public string Month { get; set; }
-        public string Year { get; set; }
-        public string System { get; set; }
+        public string FromMonth { get; set; }
+        public string ToMonth { get; set; }
+        public string ToYear { get; set; }
+        public string FromYear { get; set; }
     }
 
     public record GenerateSalesJournalPerMonthResponse
@@ -44,13 +45,13 @@ public class GenerateSalesJournalPerMonth(IMediator mediator) : ControllerBase
     {
         public async Task<Result> Handle(GenerateSalesJournalPerMonthCommand request, CancellationToken cancellationToken)
         {
-            var salesJournal = await context.GeneralLedgers
-                .Where(gl => gl.Month == request.Month)
-                .Where(gl => gl.Year == request.Year)
-                .Where(gl => gl.System == request.System ||
-                             gl.System == Common.System.Manual ||
-                             gl.BOA == "Sales Journal")
-                .ToListAsync(cancellationToken: cancellationToken);
+            
+            var salesJournal = (await context.GeneralLedgers
+                .Where(gl => string.Compare(gl.Year + "-" + gl.Month, request.FromYear + "-" + request.FromMonth) >= 0
+                             && string.Compare(gl.Year + "-" + gl.Month, request.ToYear + "-" + request.ToMonth) <= 0)
+                .Where(gl => gl.BOA == "Sales Journal")
+                .ToListAsync(cancellationToken: cancellationToken))
+                .ToList();
             
             var result = salesJournal.Select(sj => new GenerateSalesJournalPerMonthResponse
             {

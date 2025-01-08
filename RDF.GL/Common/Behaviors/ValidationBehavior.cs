@@ -5,6 +5,8 @@ using RDF.GL.Common.Messaging;
 
 namespace RDF.GL.Common.Behaviors;
 
+
+//Fluent Validation Behavior for Request Body in API
 public sealed class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValidator<TRequest>> validators) :
     IPipelineBehavior<TRequest, TResponse>
     where TRequest : ICommandBase

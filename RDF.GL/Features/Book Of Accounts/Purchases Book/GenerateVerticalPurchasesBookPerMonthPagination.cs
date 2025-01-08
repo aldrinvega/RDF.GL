@@ -11,6 +11,8 @@ namespace RDF.GL.Features.Book_Of_Accounts.Purchases_Book;
 
 public class GenerateVerticalPurchasesBookPerMonthPagination(IMediator mediator) : ControllerBase
 {
+
+    //Contrller for purchases book pagination
     [HttpGet("purchases-book/page")]
     public async Task<IActionResult> Get([FromQuery] GenerateVerticalPurchasesBookPerMonthPaginationCommand request)
     {
@@ -46,14 +48,18 @@ public class GenerateVerticalPurchasesBookPerMonthPagination(IMediator mediator)
         }
     }
 
+    //Purchases book pagination command
     public class GenerateVerticalPurchasesBookPerMonthPaginationCommand : UserParams,
         IRequest<PagedList<GeneratePurchasesBookPerMonthPaginationResponse>>
     {
         public string Search { get; set; }
-        public int From { get; set; }
-        public int To { get; set; }
-        public string Year { get; set; }
+        public string FromMonth { get; set; }
+        public string ToMonth { get; set; }
+        public string FromYear { get; set; }
+        public string ToYear { get; set; }
     }
+
+    //Purchases book pagination response
 
     public record GeneratePurchasesBookPerMonthPaginationResponse
     {
@@ -72,6 +78,8 @@ public class GenerateVerticalPurchasesBookPerMonthPagination(IMediator mediator)
         public string DrCr { get; set; }
     }
 
+
+    //Purchases book handler
     public class Handler(ProjectGLDbContext context)
         : IRequestHandler<GenerateVerticalPurchasesBookPerMonthPaginationCommand,
             PagedList<GeneratePurchasesBookPerMonthPaginationResponse>>
@@ -79,47 +87,22 @@ public class GenerateVerticalPurchasesBookPerMonthPagination(IMediator mediator)
         public async Task<PagedList<GeneratePurchasesBookPerMonthPaginationResponse>> Handle(
             GenerateVerticalPurchasesBookPerMonthPaginationCommand request, CancellationToken cancellationToken)
         {
-            IQueryable<GeneralLedger> purchasesBook = context.GeneralLedgers
-                .Where(gl => gl.Year == request.Year)
+            var purchasesBook = context.GeneralLedgers
                 .Where(gl => gl.System == Common.System.Ymir ||
-                             gl.System == Common.System.Stalwart ||
-                             gl.System == Common.System.Fisto ||
-                             gl.System == Common.System.Manual &&
-                             gl.BOA == "Purchases Book");
+                                 gl.System == Common.System.Stalwart ||
+                                 gl.System == Common.System.Fisto ||
+                                 gl.System == Common.System.Manual &&
+                                 gl.BOA == "Purchases Book"
+                                    && string.Compare(gl.Year + "-" + gl.Month, request.FromYear + "-" + request.FromMonth) >= 0
+                                    && string.Compare(gl.Year + "-" + gl.Month, request.ToYear + "-" + request.ToMonth) <= 0);
+
 
             if (!string.IsNullOrEmpty(request.Search))
             {
                 purchasesBook = purchasesBook.Where(gl => gl.ItemDescription.Contains(request.Search));
             }
 
-            var monthRangeQuery = purchasesBook
-                .Where(gl =>
-                        (gl.Month == "JAN" ? 1 :
-                        gl.Month == "FEB" ? 2 :
-                        gl.Month == "MAR" ? 3 :
-                        gl.Month == "APR" ? 4 :
-                        gl.Month == "MAY" ? 5 :
-                        gl.Month == "JUN" ? 6 :
-                        gl.Month == "JUL" ? 7 :
-                        gl.Month == "AUG" ? 8 :
-                        gl.Month == "SEP" ? 9 :
-                        gl.Month == "OCT" ? 10 :
-                        gl.Month == "NOV" ? 11 :
-                        gl.Month == "DEC" ? 12 : 0) >= request.From &&
-                        (gl.Month == "JAN" ? 1 :
-                        gl.Month == "FEB" ? 2 :
-                        gl.Month == "MAR" ? 3 :
-                        gl.Month == "APR" ? 4 :
-                        gl.Month == "MAY" ? 5 :
-                        gl.Month == "JUN" ? 6 :
-                        gl.Month == "JUL" ? 7 :
-                        gl.Month == "AUG" ? 8 :
-                        gl.Month == "SEP" ? 9 :
-                        gl.Month == "OCT" ? 10 :
-                        gl.Month == "NOV" ? 11 :
-                        gl.Month == "DEC" ? 12 : 0) <= request.To);
-
-            var result = monthRangeQuery.Select(pb => new GeneratePurchasesBookPerMonthPaginationResponse
+            var result = purchasesBook.Select(pb => new GeneratePurchasesBookPerMonthPaginationResponse
             {
                 GlDate = $"{pb.Month}. {pb.Year}",
                 Month = pb.Month,
@@ -131,7 +114,7 @@ public class GenerateVerticalPurchasesBookPerMonthPagination(IMediator mediator)
                 PoNumber = pb.PONumber,
                 RrNumber = pb.RRNumber,
                 ReceiptNumber = pb.ReferenceNo,
-                Amount = pb.LineAmount > 0 ? pb.LineAmount.Value : 0,
+                Amount = pb.LineAmount,
                 NameOfAccount = pb.AccountTitle,
                 DrCr = pb.DRCP
             });
@@ -139,6 +122,5 @@ public class GenerateVerticalPurchasesBookPerMonthPagination(IMediator mediator)
             return await PagedList<GeneratePurchasesBookPerMonthPaginationResponse>.CreateAsync(result,
                 request.PageNumber, request.PageSize);
         }
-
     }
 }

@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RDF.GL.Domain;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace RDF.GL.Data;
 
+
+// Data Context for the application
 public class ProjectGLDbContext :DbContext
 {
     public ProjectGLDbContext(DbContextOptions<ProjectGLDbContext> options) : base(options) { }
@@ -52,9 +53,7 @@ public class ProjectGLDbContext :DbContext
             .HasOne(x => x.AddedByUser)
             .WithMany()
             .HasForeignKey(x => x.AddedBy);
-
-
-        
+ 
 
     }
 

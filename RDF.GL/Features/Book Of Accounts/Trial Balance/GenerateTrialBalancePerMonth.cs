@@ -33,9 +33,10 @@ public class GenerateTrialBalancePerMonth : ControllerBase
     public class GenerateTrialBalancePerMonthCommand : IRequest<Result>
     {
         public string Search { get; set; }
-        public string From { get; set; }
-        public string To { get; set; }
-        public string Year { get; set; }
+        public string FromMonth { get; set; }
+        public string ToMonth { get; set; }
+        public string ToYear { get; set; }
+        public string FromYear { get; set; }
     }
     
     public record GenerateTrialBalancePerMonthResponse
@@ -48,6 +49,7 @@ public class GenerateTrialBalancePerMonth : ControllerBase
         public decimal? Debit { get; set; }
         public decimal? Credit { get; set; }
         public string Drcr { get; set; }
+        public string Month { get; set; }
     }
     
     public class Handler(ProjectGLDbContext context) : IRequestHandler<GenerateTrialBalancePerMonthCommand, Result>
@@ -55,22 +57,24 @@ public class GenerateTrialBalancePerMonth : ControllerBase
         public async Task<Result> Handle(GenerateTrialBalancePerMonthCommand request,
             CancellationToken cancellationToken)
         {
+
             var trialBalance = await context.GeneralLedgers
-                .Where(gl => gl.Month == request.From || gl.Month == request.To)
-                .Where(gl => gl.Year == request.Year)
+                .Where(gl => string.Compare(gl.Year + "-" + gl.Month, request.FromYear + "-" + request.FromMonth) >= 0
+                             && string.Compare(gl.Year + "-" + gl.Month, request.ToYear + "-" + request.ToMonth) <= 0)
                 .GroupBy(x => new
                 {
                     x.AccountTitle
                 })
                 .Select(gl => new GenerateTrialBalancePerMonthResponse
                 {
+                    Month = gl.First().Month,
                     Date = gl.First().TransactionDate.ToString("MM/dd/yyyy"),
                     CustomerName = gl.First().ClientSupplier,
                     ReferenceNumber = gl.First().ReferenceNo,
                     Amount = gl.Sum(tb => tb.LineAmount > 0 ? tb.LineAmount : 0),
                     ChartOfAccount = gl.Key.AccountTitle,
-                    Debit = gl.Sum( tb => tb.LineAmount > 0 ? tb.LineAmount : 0),
-                    Credit = gl.Sum( tb => tb.LineAmount < 0 ? tb.LineAmount : 0),
+                    Debit = gl.Sum(tb => tb.LineAmount > 0 ? tb.LineAmount : 0),
+                    Credit = gl.Sum(tb => tb.LineAmount < 0 ? tb.LineAmount : 0),
                     Drcr = gl.First().DRCP
                 })
                 .ToListAsync(cancellationToken: cancellationToken);

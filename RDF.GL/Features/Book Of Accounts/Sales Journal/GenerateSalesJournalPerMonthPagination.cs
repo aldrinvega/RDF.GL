@@ -49,9 +49,10 @@ public class GenerateSalesJournalPerMonthPagination(IMediator mediator) : Contro
         IRequest<PagedList<GenerateSalesJournalPerMonthPaginationResponse>>
     {
         public string Search { get; set; }
-        public string Month { get; set; }
-        public string Year { get; set; }
-        public string System { get; set; }
+        public string FromMonth { get; set; }
+        public string ToMonth { get; set; }
+        public string ToYear { get; set; }
+        public string FromYear { get; set; }
     }
 
     public class GenerateSalesJournalPerMonthPaginationResponse
@@ -72,12 +73,10 @@ public class GenerateSalesJournalPerMonthPagination(IMediator mediator) : Contro
             GenerateSalesJournalPerMonthPaginationCommand request, CancellationToken cancellationToken)
         {
             IQueryable<GeneralLedger> salesJournal = context.GeneralLedgers
-                .Where(gl => gl.Month == request.Month)
-                .Where(gl => gl.Year == request.Year)
-                .Where(gl => gl.System == request.System ||
-                             gl.System == Common.System.Manual ||
-                             gl.BOA == "Sales Journal");
-
+                .Where(gl => string.Compare(gl.Year + "-" + gl.Month, request.FromYear + "-" + request.FromMonth) >= 0
+                             && string.Compare(gl.Year + "-" + gl.Month, request.ToYear + "-" + request.ToMonth) <= 0)
+                .Where(gl => gl.BOA == "Sales Journal");
+            
             var result = salesJournal
                 .Select(sj => new GenerateSalesJournalPerMonthPaginationResponse
                 {
@@ -85,9 +84,9 @@ public class GenerateSalesJournalPerMonthPagination(IMediator mediator) : Contro
                     CustomerName = sj.ClientSupplier,
                     ReferenceNumber = sj.ReferenceNo,
                     ChartOfAccount = sj.AccountTitle,
-                    LineAmount = sj.LineAmount.HasValue ? Math.Round(sj.LineAmount.Value, 2) : 0,
-                    Debit = sj.LineAmount > 0 ? Math.Round(sj.LineAmount.Value, 2) : 0,
-                    Credit = sj.LineAmount < 0 ? Math.Round(sj.LineAmount.Value, 2) : 0,
+                    LineAmount = sj.LineAmount ?? 0,
+                    Debit = sj.LineAmount > 0 ? sj.LineAmount.Value : 0,
+                    Credit = sj.LineAmount < 0 ? sj.LineAmount.Value : 0,
                     DrCr = sj.DRCP
                 });
             

@@ -9,6 +9,7 @@ namespace RDF.GL.Features.Book_Of_Accounts.Purchases_Book;
 
 public class GenerateVerticalPurchasesBookPerMonth(IMediator mediator) : ControllerBase
 {
+    //Controller for the puchases book
     [HttpGet("purchases-book")]
     public async Task<IActionResult> GetPurchaseBookPerMonth([FromQuery] GeneratePurchasesBookPerMonthCommand request)
     {
@@ -23,13 +24,17 @@ public class GenerateVerticalPurchasesBookPerMonth(IMediator mediator) : Control
         }
     }
     
+    //Purchases book Command
     public class GeneratePurchasesBookPerMonthCommand : IRequest<Result>
     {
-        public int From { get; set; }
-        public int To { get; set; }
-        public string Year { get; set; }
+        public string FromMonth { get; set; }
+        public string ToMonth { get; set; }
+        public string FromYear { get; set; }
+        public string ToYear { get; set; }
     }
 
+
+    //Purchases book response
     public class GeneratePurchasesBookPerMonthResponse
     {
         public string GlDate  { get; set; }
@@ -48,46 +53,41 @@ public class GenerateVerticalPurchasesBookPerMonth(IMediator mediator) : Control
         
     }
     
+
+    //Purchases book handler
     public class Handler(ProjectGLDbContext  context) : IRequestHandler<GeneratePurchasesBookPerMonthCommand, Result>
     {
         public async Task<Result> Handle(GeneratePurchasesBookPerMonthCommand request, CancellationToken cancellationToken)
         {
-            var monthMapping = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
-            {
-                { "JAN", 01 }, { "FEB", 02 }, { "MAR", 03 }, { "APR", 04 },
-                { "MAY", 05 }, { "JUN", 06 }, { "JUL", 07 }, { "AUG", 08 },
-                { "SEP", 09 }, { "OCT", 10 }, { "NOV", 11 }, { "DEC", 12 }
-            };
             
-            var purchasesBook = (await context.GeneralLedgers
-                    .Where(gl => gl.Year == request.Year)
-                    .Where(gl => gl.System == Common.System.Ymir || 
-                                 gl.System == Common.System.Stalwart || 
-                                 gl.System == Common.System.Fisto ||    
+                var purchasesBook = await context.GeneralLedgers
+                    .Where(gl => gl.System == Common.System.Ymir ||
+                                 gl.System == Common.System.Stalwart ||
+                                 gl.System == Common.System.Fisto ||
                                  gl.System == Common.System.Manual &&
-                                 gl.BOA == "Purchases Book")
-                    .ToListAsync(cancellationToken))
-                .Where(gl => monthMapping[gl.Month] >= request.From && monthMapping[gl.Month] <= request.To)
-                .ToList();
+                                 gl.BOA == "Purchases Book"
+                                    && string.Compare(gl.Year + "-" + gl.Month, request.FromYear + "-" + request.FromMonth) >= 0
+                                    && string.Compare(gl.Year + "-" + gl.Month, request.ToYear + "-" + request.ToMonth) <= 0)
+                    .ToListAsync(cancellationToken);
 
-            var result = purchasesBook.Select(pb => new GeneratePurchasesBookPerMonthResponse
-            {
-                GlDate = $"{pb.Month}. {pb.Year}",
-                TransactionDate = pb.TransactionDate.ToString("yyyy-MM-dd"),
-                NameOfSupplier = pb.ClientSupplier,
-                Description = pb.ItemDescription,
-                PoNumber = pb.PONumber,
-                Apv = pb.VoucherJournal,
-                RrNumber = pb.RRNumber,
-                ReceiptNumber = pb.ReferenceNo,
-                Amount = pb.LineAmount,
-                NameOfAccount = pb.AccountTitle,
-                Debit = pb.LineAmount > 0 ? pb.LineAmount.Value : 0,
-                Credit = pb.LineAmount < 0 ? pb.LineAmount.Value : 0,
-                DRCR = pb.DRCP
-            });
+                var result = purchasesBook.Select(pb => new GeneratePurchasesBookPerMonthResponse
+                {
+                    GlDate = $"{pb.Month}. {pb.Year}",
+                    TransactionDate = pb.TransactionDate.ToString("yyyy-MM-dd"),
+                    NameOfSupplier = pb.ClientSupplier,
+                    Description = pb.ItemDescription,
+                    PoNumber = pb.PONumber,
+                    Apv = pb.VoucherJournal,
+                    RrNumber = pb.RRNumber,
+                    ReceiptNumber = pb.ReferenceNo,
+                    Amount = pb.LineAmount,
+                    NameOfAccount = pb.AccountTitle,
+                    Debit = pb.LineAmount > 0 ? pb.LineAmount.Value : 0,
+                    Credit = pb.LineAmount < 0 ? pb.LineAmount.Value : 0,
+                    DRCR = pb.DRCP
+                });
 
-            return Result.Success(result);
+                return Result.Success(result);
         }
     }
 }

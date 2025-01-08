@@ -50,8 +50,10 @@ public class GenerateTrialBalancePerMonthPagination(IMediator mediator) : Contro
         IRequest<PagedList<GenerateTrialBalancePerMonthPaginationResponse>>
     {
         public string Search { get; set; }
-        public string Month { get; set; }
-        public string Year { get; set; }
+        public string FromMonth { get; set; }
+        public string ToMonth { get; set; }
+        public string ToYear { get; set; }
+        public string FromYear { get; set; }
     }
     
     public class GenerateTrialBalancePerMonthPaginationResponse
@@ -72,8 +74,8 @@ public class GenerateTrialBalancePerMonthPagination(IMediator mediator) : Contro
             GenerateTrialBalancePerMonthPaginationCommand request, CancellationToken cancellationToken)
         {
             IQueryable<GeneralLedger> trialBalance = context.GeneralLedgers
-                .Where(gl => gl.Month == request.Month)
-                .Where(gl => gl.Year == request.Year);
+                .Where(gl => string.Compare(gl.Year + "-" + gl.Month, request.FromYear + "-" + request.FromMonth) >= 0
+                             && string.Compare(gl.Year + "-" + gl.Month, request.ToYear + "-" + request.ToMonth) <= 0);
 
             var result = trialBalance
                 .GroupBy(x => new

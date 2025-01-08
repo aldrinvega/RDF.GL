@@ -1,17 +1,17 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualBasic.CompilerServices;
 using RDF.GL.Common;
 using RDF.GL.Common.Extension;
 using RDF.GL.Common.Pagination;
 using RDF.GL.Data;
-using RDF.GL.Domain;
 
 namespace RDF.GL.Features.Book_Of_Accounts.Purchases_Book;
 [Route("api/book-of-accounts"), ApiController]
 
 public class GenerateHorizontalPurchasesBookPerMonthPagination(IMediator mediator) : ControllerBase
 {
+
+    //Contrller for purchases book horizontal pagination
     [HttpGet("purchases-book/horizontal/page")]
     public async Task<IActionResult> Get([FromQuery] GenerateHorizontalPurchasesBookPerMonthCommand request)
     {
@@ -45,19 +45,24 @@ public class GenerateHorizontalPurchasesBookPerMonthPagination(IMediator mediato
             return BadRequest(e.Message);
         }
     }
+
+    //Horizontal puchases book command
     public class GenerateHorizontalPurchasesBookPerMonthCommand : UserParams, IRequest<PagedList<GenerateHorizontalPurchasesBookPerMonthResponse>>
     {
-        public string Month { get; set; }
-        public string Year { get; set; }
+        public string FromMonth { get; set; }
+        public string ToMonth { get; set; }
+        public string FromYear { get; set; }
+        public string ToYear { get; set; }
     }
     
+    //Horizontal purchases book response
     public class GenerateHorizontalPurchasesBookPerMonthResponse
     {
         public string GlDate { get; set; }
         public string TransactionDate { get; set; }
         public string NameOfSupplier { get; set; }
         public string Description { get; set; }
-        public string POoNumber { get; set; }
+        public string PONumber { get; set; }
         public string RrNumber { get; set; }
         public string Apv { get; set; }
         public string ReceiptNumber { get; set; }
@@ -73,19 +78,21 @@ public class GenerateHorizontalPurchasesBookPerMonthPagination(IMediator mediato
         }
     }
     
+
+    //Horizontal purchases book handler
     public class Handler(ProjectGLDbContext context) : IRequestHandler<GenerateHorizontalPurchasesBookPerMonthCommand, PagedList<GenerateHorizontalPurchasesBookPerMonthResponse>>
     {
         public async Task<PagedList<GenerateHorizontalPurchasesBookPerMonthResponse>> Handle(
             GenerateHorizontalPurchasesBookPerMonthCommand request, CancellationToken cancellationToken)
         {
             var purchasesBook = context.GeneralLedgers
-                .Where(gl => gl.Month == request.Month)
-                .Where(gl => gl.Year == request.Year)
-                .Where(gl => gl.System == Common.System.Fisto || 
-                             gl.System == Common.System.Ymir || 
-                             gl.System == Common.System.Stalwart ||
-                             gl.System == Common.System.Manual ||
-                             gl.BOA == "Purchases Book") 
+                 .Where(gl => gl.System == Common.System.Ymir ||
+                                 gl.System == Common.System.Stalwart ||
+                                 gl.System == Common.System.Fisto ||
+                                 gl.System == Common.System.Manual &&
+                                 (gl.BOA == "Purchases Book"
+                                    && string.Compare(gl.Year + "-" + gl.Month, request.FromYear + "-" + request.FromMonth) >= 0
+                                    && string.Compare(gl.Year + "-" + gl.Month, request.ToYear + "-" + request.ToMonth) <= 0))
                 .GroupBy(gl => new
                 {
                     gl.Month,
@@ -103,7 +110,7 @@ public class GenerateHorizontalPurchasesBookPerMonthPagination(IMediator mediato
                     TransactionDate = sj.First().TransactionDate.ToString("MM/dd/yyyy"),
                     NameOfSupplier = sj.Key.ClientSupplier,
                     Description = sj.First().ItemDescription,
-                    POoNumber = sj.First().PONumber,
+                    PONumber = sj.First().PONumber,
                     RrNumber = sj.First().RRNumber,
                     Apv = sj.First().ChequeVoucherNumber,
                     ReceiptNumber = sj.First().ReferenceNo,

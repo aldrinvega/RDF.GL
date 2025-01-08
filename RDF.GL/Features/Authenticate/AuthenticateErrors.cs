@@ -2,6 +2,9 @@
 
 namespace RDF.GL.Features.Authenticate;
 
+
+//Errors for Authentication
+
 public class AuthenticateErrors
 {
     public static Error UsernamePasswordIncorrect() =>

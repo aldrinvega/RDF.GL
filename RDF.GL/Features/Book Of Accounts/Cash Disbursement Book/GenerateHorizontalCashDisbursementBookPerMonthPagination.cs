@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RDF.GL.Common;
@@ -10,9 +9,11 @@ using RDF.GL.Data;
 namespace RDF.GL.Features.Book_Of_Accounts.Cash_Disbursement_Book;
 [Route("api/book-of-accounts"), ApiController]
 
+
+//Class for the whole Cash Disbursement Book
 public class GenerateHorizontalCashDisbursementBookPerMonthPagination(IMediator mediator) : ControllerBase
 {
-
+    //Controller for the whole Cash Disbursement Book
     [HttpGet("cash-disbursement-book/horizontal/page")]
     public async Task<IActionResult> GetCashDisbursementBookPerMonth(
         [FromQuery] GenerateHorizontalCashDisbursementBookPerMonthPaginationCommand request)
@@ -49,13 +50,19 @@ public class GenerateHorizontalCashDisbursementBookPerMonthPagination(IMediator 
             return BadRequest(e.Message);
         }
     }
+
+    // Command for Cash Disbursement Book
     public class GenerateHorizontalCashDisbursementBookPerMonthPaginationCommand : UserParams, IRequest<PagedList<GenerateHorizontalCashDisbursementBookPerMonthResponse>>
     {
         public string Search { get; set; }
-        public string Month { get; set; }
-        public string Year { get; set; }
+        public string FromMonth { get; set; }
+        public string ToMonth { get; set; }
+        public string FromYear { get; set; }
+        public string ToYear { get; set; }
     }
 
+
+    //Response for Cash Disbursement Book
     public record GenerateHorizontalCashDisbursementBookPerMonthResponse
     {
         public string ChequeDate { get; set; }
@@ -77,15 +84,19 @@ public class GenerateHorizontalCashDisbursementBookPerMonthPagination(IMediator 
         }
     }
 
+    //Handler for Cash Disbursement Book
+
     public class Handler(ProjectGLDbContext context)
         : IRequestHandler<GenerateHorizontalCashDisbursementBookPerMonthPaginationCommand, PagedList<GenerateHorizontalCashDisbursementBookPerMonthResponse>>
     {
+
+        //Method for Cash Disbursement Book
         public async Task<PagedList<GenerateHorizontalCashDisbursementBookPerMonthResponse>> Handle(GenerateHorizontalCashDisbursementBookPerMonthPaginationCommand request,
             CancellationToken cancellationToken)
         {
             var cashDisbursementBook = context.GeneralLedgers
-                .Where(gl => gl.Month == request.Month)
-                .Where(gl => gl.Year == request.Year)
+                .Where(gl =>  string.Compare(gl.Year + "-" + gl.Month, request.FromYear + "-" + request.FromMonth) >= 0
+                             && string.Compare(gl.Year + "-" + gl.Month, request.ToYear + "-" + request.ToMonth) <= 0)
                 .Where(gl => gl.BOA == "Cash Disbursement Book")
                 .GroupBy(gl => new
                 {
@@ -95,7 +106,7 @@ public class GenerateHorizontalCashDisbursementBookPerMonthPagination(IMediator 
                     gl.ChequeVoucherNumber,
                     gl.ChequeNumber
                 });
-
+            
             var result = cashDisbursementBook
                 .Select(sj => new GenerateHorizontalCashDisbursementBookPerMonthResponse
                 {
